@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U8g2 字体生成器（Web）</title>
+<style>
+  :root { --bg:#0f172a; --card:#111827; --ink:#e5e7eb; --muted:#94a3b8; --accent:#22d3ee; }
+  body{margin:0;font-family:system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans CJK SC", Arial; background:var(--bg); color:var(--ink);}
+  .wrap{max-width:980px;margin:24px auto;padding:0 16px;}
+  .card{background:var(--card); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  h1{font-size:20px;margin:0 0 12px;font-weight:700}
+  .row{display:grid; grid-template-columns:160px 1fr auto; gap:12px; align-items:center; margin:10px 0;}
+  .row label{color:var(--muted)}
+  input[type="text"], input[type="number"], input[type="file"], textarea, select{
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid #374151; background:#0b1221; color:var(--ink); outline:none;
+  }
+  textarea{min-height:80px}
+  .grid{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px}
+  .checkbox{display:flex; align-items:center; gap:8px; font-size:14px; color:#cbd5e1}
+  .btn{padding:10px 14px; border-radius:10px; border:1px solid #334155; background:#0b1221; color:var(--ink); cursor:pointer}
+  .btn.primary{background:linear-gradient(135deg,#06b6d4,#22d3ee); color:#001219; border:none; font-weight:700}
+  .muted{color:var(--muted); font-size:12px}
+  .logs{white-space:pre-wrap; background:#0b1221; border:1px solid #334155; border-radius:10px; padding:12px; min-height:140px}
+  .links a{color:var(--accent); text-decoration:none; margin-right:12px}
+  .badge{display:inline-block; background:#0b1221; border:1px solid #334155; padding:4px 8px; border-radius:999px; font-size:12px; color:#cbd5e1; margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>U8g2 字体生成器（TTF → BDF → .h）</h1>
+    <div class="muted" id="deps"></div>
+
+    <form id="form" class="form" onsubmit="return false;">
+      <div class="row">
+        <label>字体文件</label>
+        <input type="file" name="fontfile" accept=".ttf,.otf" required>
+        <span></span>
+      </div>
+
+      <div class="row">
+        <label>像素大小(px)</label>
+        <input type="number" name="pixel_size" value="26" min="4" max="256" required>
+        <span class="muted">建议 12–64</span>
+      </div>
+
+      <div class="row">
+        <label>u8g2 符号名</label>
+        <input type="text" name="symbol" placeholder="u8g2_font_custom_26">
+        <span class="muted">自动清理非法字符</span>
+      </div>
+
+      <div class="row" style="grid-template-columns:160px 1fr;">
+        <label>预设字符集</label>
+        <div class="grid">
+          <label class="checkbox"><input type="checkbox" name="presets[]" value="digits" checked> 数字 0-9</label>
+          <label class="checkbox"><input type="checkbox" name="presets[]" value="A_Z" checked> 英文 A-Z</label>
+          <label class="checkbox"><input type="checkbox" name="presets[]" value="a_z" checked> 英文 a-z</label>
+          <label class="checkbox"><input type="checkbox" name="presets[]" value="ascii_printable"> ASCII 可打印</label>
+          <label class="checkbox"><input type="checkbox" name="presets[]" value="latin1"> Latin-1</label>
+          <label class="checkbox"><input type="checkbox" name="presets[]" value="cjk_basic"> CJK 基本汉字 (4E00-9FA5)</label>
+          <label class="checkbox"><input type="checkbox" name="presets[]" value="cn_punct"> 中文标点</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>包含空格</label>
+        <div class="checkbox"><input type="checkbox" name="include_space" value="1" checked> 是</div>
+        <span></span>
+      </div>
+
+      <div class="row" style="grid-template-columns:160px 1fr;">
+        <label>直接粘贴字符</label>
+        <textarea name="custom_chars" placeholder="在此粘贴：AaBb你好…"></textarea>
+      </div>
+
+      <div class="row" style="grid-template-columns:160px 1fr;">
+        <label>范围表达式</label>
+        <input type="text" name="custom_ranges" placeholder="例：65-90,97-122,32 或 0x4E00-0x9FA5">
+      </div>
+
+      <div class="row" style="grid-template-columns:160px 1fr;">
+        <label></label>
+        <button class="btn primary" id="btnGen">生成字体</button>
+      </div>
+    </form>
+
+    <div style="margin:14px 0;">
+      <span class="badge">提示</span>
+      <span class="muted">中文字符很多，生成可能需要数秒。可只勾选你需要的范围以减小文件体积。</span>
+    </div>
+
+    <div class="logs" id="logs">日志输出将在此显示…</div>
+    <div class="links" id="links" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+<script>
+  // 依赖检测展示（后端渲染）
+  const depText = {{ deps|tojson }};
+  const el = document.getElementById('deps');
+  el.textContent = `otf2bdf: ${depText.otf2bdf} ｜ bdfconv: ${depText.bdfconv}`;
+</script>
+</body>
+</html>
+

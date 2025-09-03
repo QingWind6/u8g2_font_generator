@@ -1,0 +1,13 @@
+# render.yaml
+services:
+  - type: web
+    name: u8g2-font-gen
+    env: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /api/deps
+    envVars:
+      - key: U8G2_MAX_UPLOAD_MB
+        value: "100"
+      - key: OTF2BDF_ARGS
+        value: "-c iso10646-1"
