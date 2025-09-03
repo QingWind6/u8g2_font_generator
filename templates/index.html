@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-t">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>U8g2 字体生成器（Web）</title>
 <style>
@@ -85,6 +85,13 @@
         <button class="btn primary" id="btnGen">生成字体</button>
       </div>
     </form>
+    
+    <div id="progress-area" style="display:none; margin: 20px 0;">
+      <div id="progress-label" style="margin-bottom: 8px; color: var(--muted);"></div>
+      <div class="progress-bar" style="background: #0b1221; border-radius: 8px; padding: 3px; border: 1px solid #334155;">
+        <div id="progress-bar-inner" style="width: 0%; height: 12px; background: var(--accent); border-radius: 6px; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
 
     <div style="margin:14px 0;">
       <span class="badge">提示</span>
@@ -105,4 +112,3 @@
 </script>
 </body>
 </html>
-
